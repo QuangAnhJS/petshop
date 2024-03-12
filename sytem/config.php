@@ -33,7 +33,7 @@ if (isset($_SESSION['User'])) {
             $chucvu = 'admin';
             $code = 3;
             if (!isset($_SESSION['quanli'])) {
-                header('location: /datatable.php');
+                header('location: /page/datatable.php');
                 $_SESSION['quanli'] = true; // Đánh dấu rằng đã chuyển hướng
                 exit;
             }

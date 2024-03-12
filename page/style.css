@@ -1,0 +1,121 @@
+* {
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+    font-family: 'Roboto Slab', serif;
+}
+
+body {
+    background: pink;
+    position: relative;
+    margin: 0;
+    padding: 0 310px;
+    transition: 1s;
+}
+
+ul,
+li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 288px;
+    height: 100vh;
+    background: linear-gradient(-45deg, #1970e2, #4695ff);
+    padding: 1.25rem 0.5rem 2rem;
+    transition: 1s;
+    z-index: 2;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 19px;
+}
+
+img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    margin-right: 11px;
+}
+
+.nav {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+.nav_toggle {
+    position: absolute;
+    top: 31px;
+    right: -10px;
+    font-size: 30px;
+}
+
+.nav_link:hover {
+    background: rgb(187, 173, 173);
+}
+
+.hover {
+    margin-bottom: 10px;
+}
+
+.nav_link {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    transition: 1s;
+    border-radius: 7px;
+}
+
+.nav_link:hover {
+    background: red;
+    /* Thêm dòng CSS này để thay đổi màu nền của cả element .nav_link khi hover */
+}
+
+i.bx.bx-grid-alt {
+    margin-right: 21px;
+    font-size: 31px;
+}
+
+i .bx bx-exit {
+    margin-right: 21px;
+    font-size: 31px;
+}
+
+.show {
+    width: 70px;
+}
+
+.rotate {
+    transform: rotate(180deg);
+    transition: 0.3s;
+}
+
+.container_row {
+    background: white;
+}
+
+.expander {
+    padding: 0 90px;
+}
+
+.dangxuat {
+    font-size: 31px;
+}
+
+.ward {
+    background: red;
+}

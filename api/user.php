@@ -172,4 +172,19 @@ switch ($_GET['action']) {
         }
         echo json_encode($json, JSON_UNESCAPED_UNICODE);
         break;
+    case 'SearchProduct':
+        $json = [];
+        $data = mysqli_real_escape_string($conn, $_GET['data']);
+        $query = mysqli_query($conn, "SELECT * FROM product WHERE ProductName LIKE '%$data%' ");
+        if ($query) {
+            $results = [];
+            while ($row = mysqli_fetch_assoc($query)) {
+                $results[] = $row;
+            }
+            $json = ['status' => 200, 'msg' => $results];
+        } else {
+            $json = ['status' => 500, 'msg' => 'Lỗi trong quá trình tìm kiếm'];
+        }
+        echo json_encode($json, JSON_UNESCAPED_UNICODE);
+        break;
 }

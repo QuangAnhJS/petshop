@@ -14,30 +14,30 @@ while ($rowOrder = mysqli_fetch_assoc($queryOrder)) {
 	$statusOrder = $rowOrder['status'];
 	$queryProduct = mysqli_query($conn, "SELECT * FROM `product` WHERE `id`='$rowProductID'");
 	$rowProduct = mysqli_fetch_assoc($queryProduct);
-
-
+	$rowID = $rowOrder['id'];
 	if ($statusOrder == 1) {
 		$status = 'đơn hàng đang xác nhận';
+		$ok = '<button type="button" class="CancelOrder" data-id="' . $rowID . '">Hủy đơn hàng</button>';
 	} elseif ($statusOrder == 2) {
-		$status = 'đơn hàng đang trên dường vận chuyển ';
+		$status = 'Đơn hàng đang vận chuyển ';
+		$ok = '';
 	} elseif ($statusOrder == 3) {
-		$status = 'đơn hàng đã giao thành công';
+		$status = 'đơn hàng đã được hủy';
+		$ok = '';
 	}
-
-
 ?>
 
-<div class="product-widget">
-    <div class="product-img">
-        <img src="<?= $rowProduct['img']; ?>" alt="">
-    </div>
-    <div class="product-body">
-        <h3 class="product-name"><a href="#"><?=$rowProduct['ProductName'];?></a></h3>
-        <h4 class="product-price">$<?= $rowProduct['Price']; ?> <del
-                class="product-old-price">$<?= $rowProduct['Price']; ?></del></h4>
-        <button type="button"><?= $status; ?></button>
-    </div>
-</div>
+	<div class="product-widget">
+		<div class="product-img">
+			<img src="<?= $rowProduct['img']; ?>" alt="">
+		</div>
+		<div class="product-body">
+			<h3 class="product-name"><a href="#"><?= $rowProduct['ProductName']; ?></a></h3>
+			<h4 class="product-price">$<?= $rowProduct['Price']; ?> <del class="product-old-price">$<?= $rowProduct['Price']; ?></del></h4>
+			<button type="button"><?= $status; ?></button>
+			<?= $ok; ?>
+		</div>
+	</div>
 
 <?php
 }

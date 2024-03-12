@@ -1,5 +1,6 @@
 <?php
 require_once("config.php");
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -31,7 +32,12 @@ require_once("config.php");
     <!-- Custom stlylesheet -->
     <link type="text/css" rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="../css/styleForm.css">
+    <!-- <link rel="stylesheet" href="../style.css"> -->
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- link google font -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -39,12 +45,11 @@ require_once("config.php");
 		  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 		<![endif]-->
 
-    <script src="https://code.jquery.com/jquery-3.7.1.js"
-        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <style>
-    body {
-        background: white;
-    }
+        body {
+            background: white;
+        }
     </style>
 </head>
 
@@ -62,18 +67,18 @@ require_once("config.php");
                 <?php
                 if (isset($code) == 1) {
                 ?>
-                <ul class="header-links pull-right">
-                    <li><a href="#"><i class="fa fa-dollar"></i> USD</a></li>
-                    <li><a href="logout.php"><i class="fa fa-user-o"></i>Đăng xuất</a></li>
-                </ul>
+                    <ul class="header-links pull-right">
+                        <li><a href="blank.php"><i class="fa fa-dollar"></i> USD</a></li>
+                        <li><a href="logout.php"><i class="fa fa-user-o"></i>Đăng xuất</a></li>
+                    </ul>
                 <?php
                 } else {
                 ?>
 
-                <ul class="header-links pull-right">
-                    <li><a href="#"><i class="fa fa-dollar"></i> USD</a></li>
-                    <li><a href="login.php"><i class="fa fa-user-o"></i> My Account</a></li>
-                </ul>
+                    <ul class="header-links pull-right">
+
+                        <li><a href="login.php"><i class="fa fa-user-o"></i> My Account</a></li>
+                    </ul>
                 <?php
                 }
                 ?>
@@ -100,13 +105,20 @@ require_once("config.php");
                     <!-- SEARCH BAR -->
                     <div class="col-md-6">
                         <div class="header-search">
-                            <form>
-                                <select class="input-select">
-                                    <option value="0">All Categories</option>
-                                    <option value="1">Category 01</option>
-                                    <option value="1">Category 02</option>
-                                </select>
-                                <input class="input" placeholder="Search here">
+                            <form style="display: flex;     justify-content: center;">
+                                <!-- <select class="input-select" id="">
+                                    <option value="0">All Category</option>
+                               "     <?php
+                                        $queryCategory = mysqli_query($conn, "SELECT DISTINCT Category from `product`");
+                                        while ($rowCategory = mysqli_fetch_assoc($queryCategory)) {
+                                        ?>
+                                    <option value="1"><?= $rowCategory['Category']; ?></option>
+
+                                    <?php
+                                        }
+                                    ?>"
+                                </select> -->
+                                <input oninput="searchBy(this)" class="input" placeholder="Search here" style="    border-radius: 24px 0 0 24px;">
                                 <button class="search-btn">Search</button>
                             </form>
                         </div>
@@ -130,8 +142,7 @@ require_once("config.php");
 
 
                             <div class="dropdown">
-                                <a id="cart-dropdown-toggle" class="dropdown-toggle" data-toggle="dropdown"
-                                    aria-expanded="true">
+                                <a id="cart-dropdown-toggle" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
                                     <i class="fa fa-shopping-cart"></i>
                                     <span>Your Cart</span>
                                     <?php

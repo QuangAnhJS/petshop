@@ -1,0 +1,28 @@
+.container {
+    display: flex;
+}
+
+.left {
+    flex: 3;
+    border: 1px solid;
+    padding: 5px;
+    margin: auto;
+    border-radius: 8px;
+}
+
+.right {
+    flex: 7;
+}
+
+.content {
+    padding: 12px;
+}
+
+p {
+    font-family: "Roboto", sans-serif;
+    font-weight: 900;
+}
+
+.form p {
+    font-size: 26px;
+}

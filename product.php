@@ -430,20 +430,20 @@ $row = mysqli_fetch_assoc($query);
 </div>
 <!-- /NEWSLETTER -->
 <script>
-$(document).ready(function() {
-    $('#my-input').on('change', function() {
-        const quantity = $(this).val();
-        if (!quantity) {
-            alert("vui lòng nhập số lượng ");
-        } else if (quantity > <?= $row['StockQuantity']; ?>) {
-            alert("Số lượng không hợp lệ ");
-        } else {
-            $('.add-to-cart-btn').attr('href', `checkout.php?id=${<?= $id; ?>}&soluong=${quantity}`);
+    $(document).ready(function() {
+        $('#my-input').on('change', function() {
+            const quantity = $(this).val();
+            if (!quantity) {
+                alert("vui lòng nhập số lượng ");
+            } else if (quantity > <?= $row['StockQuantity']; ?>) {
+                alert("Số lượng không hợp lệ ");
+            } else {
+                $('.add-to-cart-btn').attr('href', `checkout.php?id=${<?= $id; ?>}&soluong=${quantity}`);
 
-        }
-        // attr lấy giá trị  Gán giá trị cho thuộc tính
+            }
+            // attr lấy giá trị  Gán giá trị cho thuộc tính
+        });
     });
-});
 </script>
 <!-- FOOTER -->
 <?php
