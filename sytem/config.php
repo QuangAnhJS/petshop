@@ -1,9 +1,9 @@
 <?php
 ob_start();
 session_start();
-$servername = "localhost";
-$username = "root";
-$password = "12345";
+$servername = "127.0.0.1";
+$username = "petshop";
+$password = "6uveIQcPLvkXUqoWmo20";
 $databaseName = "petshop";
 
 // Create connection

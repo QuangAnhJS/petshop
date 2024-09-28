@@ -46,7 +46,8 @@ require_once("config.php");
 		<![endif]-->
 
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-    <style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
         body {
             background: white;
         }
@@ -129,15 +130,7 @@ require_once("config.php");
                     <div class="col-md-3 clearfix">
                         <div class="header-ctn">
                             <!-- Wishlist -->
-                            <div>
-                                <a href="#">
-                                    <i class="fa fa-heart-o"></i>
-                                    <span>Your Wishlist</span>
-                                    <div class="qty">2</div>
-                                </a>
-                            </div>
-                            <!-- /Wishlist -->
-
+                           
                             <!-- Cart -->
 
 
@@ -146,14 +139,18 @@ require_once("config.php");
                                     <i class="fa fa-shopping-cart"></i>
                                     <span>Your Cart</span>
                                     <?php
-                                    $query = mysqli_query($conn, "SELECT * from `cart`");
-                                    $num = mysqli_num_rows($query);
-                                    if ($num > 0) {
-                                        $nums = $num;
-                                        echo '<div class="qty">' . $nums . '</div>';
-                                    } else {
-                                        echo '<div class="qty">0</div>';
-                                    }
+                                    $id = isset($_SESSION['id'])?$_SESSION['id']:null;
+                                
+                                        $query = mysqli_query($conn, "SELECT * from `cart` where `UserID`='$id'");
+
+                                        $num = mysqli_num_rows($query);
+                                        if ($num > 0) {
+                                            $nums = $num;
+                                            echo '<div class="qty">' . $nums . '</div>';
+                                        } else {
+                                            echo '<div class="qty">0</div>';
+                                        }
+                           
                                     ?>
                                 </a>
                                 <div id="cart-dropdown" class="cart-dropdown">

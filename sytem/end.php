@@ -19,18 +19,6 @@
                         </div>
                     </div>
 
-                    <div class="col-md-3 col-xs-6">
-                        <div class="footer">
-                            <h3 class="footer-title">Categories</h3>
-                            <ul class="footer-links">
-                                <li><a href="#">Hot deals</a></li>
-                                <li><a href="#">Laptops</a></li>
-                                <li><a href="#">Smartphones</a></li>
-                                <li><a href="#">Cameras</a></li>
-                                <li><a href="#">Accessories</a></li>
-                            </ul>
-                        </div>
-                    </div>
 
                     <div class="clearfix visible-xs"></div>
 
@@ -83,7 +71,7 @@
                         <span class="copyright">
                             <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
                             Copyright &copy;<script>
-                            document.write(new Date().getFullYear());
+                                document.write(new Date().getFullYear());
                             </script> All rights reserved | This template is made with <i class="fa fa-heart-o"
                                 aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
                             <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
@@ -110,27 +98,27 @@
     </script>
 
     <script>
-function searchBy(data) {
-    var text = data.value;
-    $.ajax({
-        type: 'GET',
-        url: "/api/user.php?action=SearchProduct",
-        data: {
-            data: text,
-        },
-        dataType: 'json',
-        success: function(result) {
-            if (result.status == 200) {
-                displayProduct(msg);
-            }
+        function searchBy(data) {
+            var text = data.value;
+            $.ajax({
+                type: 'GET',
+                url: "/api/user.php?action=SearchProduct",
+                data: {
+                    data: text,
+                },
+                dataType: 'json',
+                success: function(result) {
+                    if (result.status == 200) {
+                        displayProduct(msg);
+                    }
 
+                }
+            });
         }
-    });
-}
 
-function displayProduct(msg) {
+        function displayProduct(msg) {
 
-    var productHTML = `
+            var productHTML = `
     <div class="col-md-3 col-xs-6">
         <div class="product">
             <div class="product-img">
@@ -155,57 +143,126 @@ function displayProduct(msg) {
         </div>
     </div>`;
 
-}
+        }
     </script>
     <script>
-$(document).ready(function() {
-    $(".validate").click(function(event) {
-        event.preventDefault();
-        var id = $(this).data('id');
-        $.ajax({
-            type: 'POST',
-            url: "/api/quanli.php?action=OrderConfirmation",
-            data: {
-                id: id
-            },
-            dataType: 'json',
-            success: function(result) {
-                if (result.status == 200) {
-                    alert(result.msg);
-                    location.reload();
-                } else if (result.status == 404) {
-                    alert(result.msg);
-                } else if (result.status == 500) {
-                    alert(result.msg);
-                }
-            }
+        $(document).ready(function() {
+            $(".validate").click(function(event) {
+                event.preventDefault();
+                var id = $(this).data('id');
+                $.ajax({
+                    type: 'POST',
+                    url: "/api/quanli.php?action=OrderConfirmation",
+                    data: {
+                        id: id
+                    },
+                    dataType: 'json',
+                    success: function(result) {
+                        if (result.status == 200) {
+                            alert(result.msg);
+                            location.reload();
+                        } else if (result.status == 404) {
+                            alert(result.msg);
+                        } else if (result.status == 500) {
+                            alert(result.msg);
+                        }
+                    }
+                });
+            });
+        })
+        $(document).ready(function() {
+
+            $(".CancelOrder").click(function(event) {
+                event.preventDefault();
+                var id = $(this).data('id');
+                $.ajax({
+                    type: 'POST',
+                    url: "/api/quanli.php?action=CancelOrder",
+                    data: {
+                        id: id
+                    },
+                    dataType: 'json',
+                    success: function(result) {
+                        if (result.status == 200) {
+                            alert(result.msg);
+                            location.reload();
+                        } else if (result.status == 404) {
+                            alert(result.msg);
+                        } else if (result.status == 500) {
+                            alert(result.msg);
+                        }
+                    }
+                });
+            });
+        })
+        $(document).ready(function() {
+            $('#cart-dropdown-toggle').on('click', function() {
+                $.ajax({
+                    url: '/api/user.php?action=GetCart',
+                    type: 'get',
+                    dataType: 'json',
+                    success: function(result) {
+                        if (result.status === '200') {
+                            displayCartItems(result.msg);
+
+                            $('.delete').on('click', function() {
+                                var id = $(this).data('id');
+                                console.log('check id', id)
+                                $.ajax({
+                                    url: '/api/user.php?action=DeleteCart',
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: {
+                                        id: id
+                                    },
+                                    success: function(data) {
+                                        if (data.status == 200) {
+                                            location.reload();
+                                        } else {
+                                            location.reload();
+                                        }
+                                    },
+                                    error: function(xhr, status, error) {
+                                        console.error('Error:', error);
+                                    }
+                                })
+
+
+                            });
+
+                        } else {
+                            alert(data.msg);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+
+
         });
-    });
-})
-$(document).ready(function() {
-    $(".CancelOrder").click(function(event) {
-        event.preventDefault();
-        var id = $(this).data('id');
-        $.ajax({
-            type: 'POST',
-            url: "/api/quanli.php?action=CancelOrder",
-            data: {
-                id: id
-            },
-            dataType: 'json',
-            success: function(result) {
-                if (result.status == 200) {
-                    alert(result.msg);
-                    location.reload();
-                } else if (result.status == 404) {
-                    alert(result.msg);
-                } else if (result.status == 500) {
-                    alert(result.msg);
-                }
-            }
-        });
-    });
-})
+
+        function displayCartItems(cartItems) {
+            var cartDropdown = $('#cart-dropdown');
+            cartDropdown.empty();
+            cartItems.forEach(function(item) {
+                var productWidget = $('<div>').addClass('product-widget');
+                var productImg = $('<div>').addClass('product-img').append($('<img>').attr('src', item.img)
+                    .attr('alt', item.ProductName));
+                var productBody = $('<div>').addClass('product-body').append(
+                    $('<h3>').addClass('product-name').append($('<a>').attr('href', 'product.php?id=' + item.id).text(item
+                        .ProductName)),
+                    $('<h4>').addClass('product-price').append($('<span>').addClass('qty').text('1x'),
+                        '$' + item.Price)
+                );
+                var deleteBtn = $('<button>').addClass('delete').append($('<i>').addClass('fa fa-close'))
+                    .attr('data-id', item.id);
+
+                productWidget.append(productImg, productBody, deleteBtn);
+                cartDropdown.append(productWidget);
+            });
+        }
     </script>
     </body>
 

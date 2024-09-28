@@ -240,7 +240,7 @@ $(document).ready(function() {
                 data: formData,
                 dataType: "json",
                 success: function(result) {
-                    if (result.status == 200) {
+                    if (result.status == "200") {
                         alert(result.msg)
                         window.location.href = 'blank.php'
                     } else if (result.status == 404) {

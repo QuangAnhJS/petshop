@@ -1,5 +1,6 @@
 <?php
 require_once("./sytem/header.php");
+require_once("./sytem/config.php");
 ?>
 <!-- /HEADER -->
 
@@ -206,39 +207,7 @@ require_once("./sytem/header.php");
     <!-- /SECTION -->
 
     <!-- NEWSLETTER -->
-    <div id="newsletter" class="section">
-        <!-- container -->
-        <div class="container">
-            <!-- row -->
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="newsletter">
-                        <p>Sign Up for the <strong>NEWSLETTER</strong></p>
-                        <form>
-                            <input class="input" type="email" placeholder="Enter Your Email">
-                            <button class="newsletter-btn"><i class="fa fa-envelope"></i> Subscribe</button>
-                        </form>
-                        <ul class="newsletter-follow">
-                            <li>
-                                <a href="#"><i class="fa fa-facebook"></i></a>
-                            </li>
-                            <li>
-                                <a href="#"><i class="fa fa-twitter"></i></a>
-                            </li>
-                            <li>
-                                <a href="#"><i class="fa fa-instagram"></i></a>
-                            </li>
-                            <li>
-                                <a href="#"><i class="fa fa-pinterest"></i></a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <!-- /row -->
-        </div>
-        <!-- /container -->
-    </div>
+ 
 </div>
 <script>
     $(document).ready(function() {
@@ -268,74 +237,7 @@ require_once("./sytem/header.php");
         });
     })
 </script>
-<script>
-    $(document).ready(function() {
-        $('#cart-dropdown-toggle').on('click', function() {
-            $.ajax({
-                url: '/api/user.php?action=GetCart',
-                type: 'get',
-                dataType: 'json',
-                success: function(result) {
-                    if (result.status === '200') {
-                        displayCartItems(result.msg);
 
-                        $('.delete').on('click', function() {
-                            var id = $(this).data('id');
-                            console.log('check id', id)
-                            $.ajax({
-                                url: '/api/user.php?action=DeleteCart',
-                                type: 'POST',
-                                dataType: 'json',
-                                data: {
-                                    id: id
-                                },
-                                success: function(data) {
-                                    if (data.status == 200) {
-                                        location.reload();
-                                    } else {
-                                        location.reload();
-                                    }
-                                },
-                                error: function(xhr, status, error) {
-                                    console.error('Error:', error);
-                                }
-                            })
-
-
-                        });
-
-                    } else {
-                        alert(data.msg);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error:', error);
-                }
-            });
-        });
-
-        function displayCartItems(cartItems) {
-            var cartDropdown = $('#cart-dropdown');
-            cartDropdown.empty();
-            cartItems.forEach(function(item) {
-                var productWidget = $('<div>').addClass('product-widget');
-                var productImg = $('<div>').addClass('product-img').append($('<img>').attr('src', item.img)
-                    .attr('alt', item.ProductName));
-                var productBody = $('<div>').addClass('product-body').append(
-                    $('<h3>').addClass('product-name').append($('<a>').attr('href', '#').text(item
-                        .ProductName)),
-                    $('<h4>').addClass('product-price').append($('<span>').addClass('qty').text('1x'),
-                        '$' + item.Price)
-                );
-                var deleteBtn = $('<button>').addClass('delete').append($('<i>').addClass('fa fa-close'))
-                    .attr('data-id', item.id);
-
-                productWidget.append(productImg, productBody, deleteBtn);
-                cartDropdown.append(productWidget);
-            });
-        }
-    });
-</script>
 <!-- /NEWSLETTER -->
 <?php
 require_once('./sytem/end.php');

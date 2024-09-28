@@ -155,7 +155,7 @@ switch ($_GET['action']) {
                 } elseif (empty($id) || empty($ProductName) || empty($StockQuantity) || empty($Price)) {
                     $json = ['status' => 500, 'msg' => 'lỗi bất định'];
                 } else {
-                    $creteOder = mysqli_query($conn, "INSERT INTO `order`(`Price`, `ProductId`, `UserID`,`state`) VALUES ('$Price','$id','$rowid','$state')");
+                    $creteOder = mysqli_query($conn, "INSERT INTO `order`(`Price`, `ProductId`, `UserID`,`state`,`status`) VALUES ('$Price','$id','$rowid','$state',1)");
                     $id = mysqli_insert_id($conn);
                     if ($creteOder) {
                         $createOderdetali = mysqli_query($conn, "INSERT INTO `orderdetail`(`OrderID`, `StockQuantity`, `name`, `sdt`, `diachi`, `ProductName`) VALUES ('$id','$StockQuantity','$name','$phone','$address','$ProductName')");

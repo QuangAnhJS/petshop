@@ -1,3 +1,9 @@
+<?php
+require_once("./sytem/config.php");
+if (isset($_SESSION['User'])) {
+    header("location:/");
+}
+?>
 <!DOCTYPE html>
 <html data-bs-theme="light" lang="en">
 
