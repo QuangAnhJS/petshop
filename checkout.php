@@ -1,17 +1,38 @@
 <?php
 require_once('./sytem/header.php');
-$id = isset($_GET['id']) ? $_GET['id'] : "";
-$query = mysqli_query($conn, "SELECT * from `product` where `id`='$id'");
-$row = mysqli_fetch_assoc($query);
-$rowid = $row['id'];
-// $queryProduct = mysqli_query($conn, "SELECT * from `product` where `id`='$rowid'");
-// $rowProduct = mysqli_fetch_assoc($queryProduct);
-$Price = $row['Price'];
-$StockQuantity = isset($_GET['soluong']) ? $_GET['soluong'] : "";
-$NumPrice = $StockQuantity * $Price;
 if (!isset($_SESSION['User'])) {
     header("location:/login.php");
 }
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if (!empty($_POST['items']) || !empty($_POST['ProductName'])) {
+    $orderItems = [];
+
+    foreach ($_POST['items'] as $cartId) {
+        $orderItems[] = [
+            'productName' => $_POST['ProductName'][$cartId] ?? 'Không rõ',
+            'quantity' => $_POST['qty'][$cartId] ?? 1,
+            'price' => $_POST['Price'][$cartId] ?? 0,
+            'totalPrice' => $_POST['totalPrice'][$cartId] ?? 0,
+            'productId' => $_POST['ProductId'][$cartId] ?? 0
+        ];
+    }
+} else {
+    echo "Bạn chưa chọn sản phẩm nào!";
+    require_once('./sytem/end.php');
+    exit;
+}
+if (isset($_GET["id"]) && is_numeric($_GET["id"]))
+    $order_id = $_GET["id"];
+else
+    $order_id = '';
+}else {
+    header("location: /");
+    exit;
+}
+// Nếu method là POST thì tạo đơn hàng
+
+
 ?>
 <!-- /HEADER -->
 
@@ -29,7 +50,8 @@ if (!isset($_SESSION['User'])) {
     <div class="container">
         <!-- row -->
         <div class="row">
-            <form action="">
+
+            <form method="POST" action="handleCheckOut.php">
                 <div class="col-md-7">
                     <!-- Billing Details -->
                     <div class="billing-details">
@@ -56,7 +78,6 @@ if (!isset($_SESSION['User'])) {
                                 <input type="checkbox" id="create-account">
                                 <label for="create-account">
 
-
                                 </label>
 
                             </div>
@@ -76,56 +97,92 @@ if (!isset($_SESSION['User'])) {
                     </div>
                     <div class="order-summary">
                         <div class="order-col">
-                            <div><strong>PRODUCT</strong></div>
-                            <div><strong>TOTAL</strong></div>
+                            <div><strong>Sản phẩm</strong></div>
+                            <div><strong>tổng</strong></div>
                         </div>
                         <div class="order-products">
-                            <div class="order-col">
-                                <div>
-                                    <span id="StockQuantity"><?= $StockQuantity; ?></span>x <span id="ProductName">
-                                        <?= $row['ProductName']; ?></span>
+                            <?php foreach ($orderItems as $item): ?>
+                                <div class="order-col">
+                                    <div><?= htmlspecialchars($item['productName']) ?></div>
+                                    <input type="hidden" name="product_id[]" value="<?= (int)$item['productId'] ?>">
+                                    <input type="text" name="quantity[]" value="<?= (int)$item['quantity'] ?>" hidden>
+                                    <div><strong><?= (int)$item['quantity'] ?> </strong></div>
                                 </div>
-                                <div id="Price"><?= $Price; ?></div>
+                            <?php endforeach; ?>
+                        </div>
+                        <?php
+                        $totalAmount = array_sum(array_column($orderItems, 'totalPrice'));
+                        ?>
+                        <div class="order-col">
+                            <div><strong>Số tiền</strong></div>
+                            <input type="text" name="total" value="<?= $totalAmount ?>" hidden>
+                            <div><strong class="order-total"><?= number_format($totalAmount) ?></strong> VND</div>
+                        </div>
+                        <div class="payment-method">
+
+                            <div class="input-radio1">
+                                <input type="radio" name="payment" id="payment-2" value="cod" required>
+                                <label for="payment-2">Thanh toán khi nhận hàng</label>
+
+
+
                             </div>
+                            <div class="input-radio2">
+                                <input type="radio" name="payment" id="payment-3" value="online">
+                                <label for="payment-3">Thanh toán online</label>
+                            </div>
+                        </div>
 
-                        </div>
-                        <div class="order-col">
-                            <div>Shiping</div>
-                            <div><strong>FREE</strong></div>
-                        </div>
-                        <div class="order-col">
-                            <div><strong>TOTAL</strong></div>
-                            <div><strong class="order-total" id="Pice"><?= $NumPrice; ?></strong>VND</div>
-                        </div>
+                        <button class="primary-btn order-submit" id="muahang" type="submit">Đặt hàng </button>
                     </div>
-                    <div class="payment-method">
-
-                        <div class="input-radio1">
-                            <input type="radio" name="payment" id="payment-2">
-                            <label for="payment-2">
-                                <span></span>
-                                Thanh toán thi nhận hàng
-                            </label>
-
-                        </div>
-                        <div class="input-radio2">
-                            <input type="radio" name="payment" id="payment-3">
-                            <label for="payment-3">
-                                <span></span>
-                                Thanh toán online
-                            </label>
-
-                        </div>
-                    </div>
-
-                    <button class="primary-btn order-submit" id="muahang"></button>
+                    <!-- /Order Details -->
                 </div>
-                <!-- /Order Details -->
+
+            </form>
+
+
+
+
         </div>
-        </form>
-        <!-- /row -->
     </div>
-    <!-- /container -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+
+
+    <?php
+    // Nếu đang ở giao diện checkout
+    if (isset($order_id)) { ?>
+        <script>
+            var pay_status = 'Unpaid';
+
+            // Hàm kiểm tra trạng thái đơn hàng
+            // Sử dụng Ajax để lấy trạng thái đơn hàng. Nếu thanh toán thành công thì hiển thị Box đã thanh toán thành công, ẩn box checkout
+            function check_payment_status() {
+                if (pay_status == 'Unpaid') {
+                    $.ajax({
+                        type: "POST",
+                        data: {
+                            order_id: <?= $order_id; ?>
+                        },
+                        url: "https://payment-gateway-demo.sepay.dev/check_payment_status.php",
+                        dataType: "json",
+                        success: function(data) {
+                            if (data.payment_status == "Paid") {
+                                $("#checkout_box").hide();
+                                $("#success_pay_box").show();
+                                pay_status = 'Paid';
+                            }
+                        }
+                    });
+                }
+            }
+            //Kiểm tra trạng thái đơn hàng 1 giây một lần
+            setInterval(check_payment_status, 1000);
+        </script>
+    <?php } ?>
+    <!-- /row -->
+</div>
+<!-- /container -->
 </div>
 <!-- /SECTION -->
 
@@ -133,127 +190,7 @@ if (!isset($_SESSION['User'])) {
 
 <!-- /NEWSLETTER -->
 
-<script>
-$(document).ready(function() {
-    $('#muahang').prop('disabled', true);
-    $('#muahang')['html']('vui lòng chọn hình thức thanh toán...');
-    $('.input-radio2 input[type="radio"]').change(function() {
-        $('#muahang').prop('disabled', !$(this).is(':checked'));
-        $('#muahang')['html']('Mua ngay');
-        $('#muahang').click(function(event) {
-            event.preventDefault();
-            var formData = {
-                sotien: $('#Pice').html(),
-                comment: $('#ProductName').html(),
-                return_url: 'http://localhost/checkout.php?id=<?= $id; ?>&soluong=<?= $StockQuantity; ?>',
-                shop: '8jq2l7sha3gu89nleoo02qsj7b2w8ofn',
-            }
 
-            async function createBill() {
-                const response = await $.ajax({
-                    type: 'POST',
-                    url: "https://hoadon.qdevs.tech/api/user/create-bill",
-                    headers: {
-                        Authorization: "Bearer 2|aFDzou7YnXC2hipGUSSxn45QsNfcIUAkadU1K4V0",
-                    },
-                    data: formData,
-                    dataType: "json",
-                });
-
-                if (response.status === 'success') {
-
-                    const data = response.data
-                    const idHoaDon = data.id_hoadon;
-                    console.log('check id hóa don', idHoaDon)
-                    window.location = response.link
-                    await checkBill(idHoaDon);
-                } else {
-                    alert(response.status)
-                }
-            }
-
-            async function checkBill(idHoaDon) {
-                const response = await $.ajax({
-                    type: 'POST',
-                    url: "https://hoadon.qdevs.tech/api/check-bill",
-                    data: {
-                        id_hoadon: idHoaDon
-                    },
-                    dataType: "json",
-                });
-                if (response.status === 'success') {
-                    await checkOut();
-                } else if (response.status === 'error') {
-                    alert(response.status);
-                }
-            }
-            async function checkOut() {
-                var formData = {
-                    ProductID: $('#Product').val(),
-                    name: $('#name').val(),
-                    address: $('#address').val(),
-                    phone: $('#phone').val(),
-                    StockQuantity: $('#StockQuantity').html(),
-                    ProductName: $('#ProductName').html(),
-                    Price: $('#Price').html(),
-                    state: 1
-                }
-                console.log('api kiem tra', formData)
-                const response = await $.ajax({
-                    type: 'POST',
-                    url: "/api/user.php?action=checkOut",
-                    data: formData,
-                    dataType: "json",
-                });
-                if (response.status === 'success') {
-                    alert(response.status)
-                    $('#main').load('/register.php');
-                } else if (response.status === 'error') {
-                    alert(response.status)
-                }
-            }
-
-            createBill();
-        })
-    })
-    $('.input-radio1 input[type="radio"]').change(function() {
-        $('#muahang').prop('disabled', !$(this).is(':checked'));
-        $('#muahang')['html']('Mua ngay');
-        $('#muahang').click(function(event) {
-            event.preventDefault();
-            console.log('sukien')
-            var formData = {
-                ProductID: $('#Product').val(),
-                name: $('#name').val(),
-                address: $('#address').val(),
-                phone: $('#phone').val(),
-                StockQuantity: $('#StockQuantity').html(),
-                ProductName: $('#ProductName').html(),
-                Price: $('#Price').html(),
-                state: 0
-            }
-            console.log(formData)
-            $.ajax({
-                type: 'POST',
-                url: "/api/user.php?action=checkOut",
-
-                data: formData,
-                dataType: "json",
-                success: function(result) {
-                    if (result.status == "200") {
-                        alert(result.msg)
-                        window.location.href = 'blank.php'
-                    } else if (result.status == 404) {
-                        alert(result.msg)
-                    } else if (result.status == 500) {
-
-                    }
-                }
-            })
-        })
-    })
-})
-</script>
 
 <?php
 require_once('./sytem/end.php');

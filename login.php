@@ -1,7 +1,7 @@
 <?php
 $login = 'login';
 require_once("./sytem/config.php");
-if (isset($_SESSION['User'])) {
+if (isset($_SESSION['User']['username'])) {
     header("location:/");
 }
 

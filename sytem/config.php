@@ -1,9 +1,10 @@
 <?php
 ob_start();
 session_start();
-$servername = "127.0.0.1";
-$username = "petshop";
-$password = "6uveIQcPLvkXUqoWmo20";
+
+$servername = "localhost";
+$username = "root";
+$password = "12345";
 $databaseName = "petshop";
 
 // Create connection
@@ -13,33 +14,45 @@ $conn = mysqli_connect($servername, $username, $password, $databaseName);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
-if (isset($_SESSION['User'])) {
-    $login = $_SESSION['User'];
-    $get_users = mysqli_query($conn, "SELECT * from `user` where `Username`='$login' ");
+
+if (isset($_SESSION['User']) && is_array($_SESSION['User']) && isset($_SESSION['User']['username'])) {
+    $login = $_SESSION['User']['username'];
+
+    $get_users = mysqli_query($conn, "SELECT * FROM `user` WHERE `Username` = '$login' ");
     $get_row = mysqli_fetch_assoc($get_users);
-    $get_id = $get_row['id'];
-    $_SESSION['id'] = $get_id;
-    $id = $_SESSION['id'];
-    switch ($get_row) {
-        case $get_row['Role'] == 1:
+
+    if (!$get_row) {
+        die("Không tìm thấy người dùng.");
+    }
+
+    // Cập nhật session là mảng chứa thông tin người dùng
+    $_SESSION['User'] = [
+        'id' => $get_row['id'],
+        'username' => $get_row['Username'],
+        'role' => $get_row['Role']
+    ];
+
+    $id = $_SESSION['User']['id'];
+
+    switch ($get_row['Role']) {
+        case 1:
             $chucvu = 'khách hàng';
             $code = 1;
             break;
-        case $get_row['Role'] == 2:
+        case 2:
             $chucvu = 'nhân viên';
             $code = 2;
             break;
-        case $get_row['Role'] == 3:
+        case 3:
             $chucvu = 'admin';
             $code = 3;
             if (!isset($_SESSION['quanli'])) {
+                $_SESSION['quanli'] = true;
                 header('location: /page/datatable.php');
-                $_SESSION['quanli'] = true; // Đánh dấu rằng đã chuyển hướng
                 exit;
             }
             break;
         default:
-            die(" Connection failed: ");
-            break;
+            die("Phân quyền không hợp lệ.");
     }
 }

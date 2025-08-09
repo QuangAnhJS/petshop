@@ -62,6 +62,12 @@ showMenu('nav_toggle', 'navbar', 'main')
 </script>
 <script>
 new DataTable('#example');
+function formatCurrencyVND(amount) {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND'
+  }).format(amount);
+}
 </script>
 
 </body>
