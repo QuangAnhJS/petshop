@@ -30,7 +30,7 @@ $check = $conn->query("SELECT id FROM tb_orders
 if ($check->num_rows > 0) {
     die("Bạn đang có đơn hàng chưa thanh toán. Vui lòng hoàn tất trước khi tạo đơn mới.");
 }
-$sql = "INSERT INTO tb_orders (user_id, total_amount, payment_method, status)
+$sql = "INSERT INTO tb_orders (user_id, total, payment_method, payment_status)
         VALUES ('$user_id', '$total_amount', '$payment_method', '$status')";
 
 if ($conn->query($sql) === TRUE) {

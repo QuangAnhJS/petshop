@@ -84,7 +84,7 @@ if (!$row) {
                             Qty
 
                             <div class="input-number">
-                                <input type="number" style="outline: none;" id="my-input" value="1" min="1" max="<?= $stockQuantity ?>">
+                                <input type="number" style="outline: none;" id="my-input" value="1" min="1" >
                                 <span class="qty-up">+</span>
                                 <span class="qty-down">-</span>
                             </div>

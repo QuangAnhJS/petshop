@@ -7,17 +7,17 @@ File này dùng làm endpoint nhận webhook từ SePay. Mỗi khi có giao dị
  Endpoint nhận webhook sẽ là https://yourwebsite.tld/sepay_webhook.php
 */
 
- // Include file db_connect.php, file chứa toàn bộ kết nối CSDL
+// Include file config.php chứa kết nối CSDL
 require_once './sytem/config.php';
 
-// Lay du lieu tu webhooks, xem cac truong du lieu tai https://docs.sepay.vn/tich-hop-webhooks.html#du-lieu
+// Lấy dữ liệu từ webhook (json body)
 $data = json_decode(file_get_contents('php://input'));
-if(!is_object($data)) {
-    echo json_encode(['success'=>FALSE, 'message' => 'No data']);
+if (!is_object($data)) {
+    echo json_encode(['success' => false, 'message' => 'No data']);
     die('No data found!');
 }
 
-// Khoi tao cac bien
+// Khởi tạo các biến từ dữ liệu webhook
 $gateway = $data->gateway;
 $transaction_date = $data->transactionDate;
 $account_number = $data->accountNumber;
@@ -35,51 +35,54 @@ $body = $data->description;
 $amount_in = 0;
 $amount_out = 0;
 
-// Kiem tra giao dich tien vao hay tien ra
-if($transfer_type == "in")
+// Kiểm tra giao dịch tiền vào hay tiền ra
+if ($transfer_type == "in") {
     $amount_in = $transfer_amount;
-else if($transfer_type == "out")
+} else if ($transfer_type == "out") {
     $amount_out = $transfer_amount;
-
-// Tao query SQL
-$sql = "INSERT INTO tb_transactions (gateway, transaction_date, account_number, sub_account, amount_in, amount_out, accumulated, code, transaction_content, reference_number, body) VALUES ('{$gateway}', '{$transaction_date}', '{$account_number}', '{$sub_account}', '{$amount_in}', '{$amount_out}', '{$accumulated}', '{$code}', '{$transaction_content}', '{$reference_number}', '{$body}')";
-
-// Chay query de luu giao dich vao CSDL
-if ($conn->query($sql) === TRUE) {
-   // echo json_encode(['success'=>TRUE]);
-} else {
-    echo json_encode(['success'=>FALSE, 'message' => 'Can not insert record to mysql: ' . $conn->error]);
 }
 
-// Tách mã đơn hàng
+// Tạo câu SQL lưu giao dịch vào CSDL
+$sql = "INSERT INTO tb_transactions (gateway, transaction_date, account_number, sub_account, amount_in, amount_out, accumulated, code, transaction_content, reference_number, body) 
+        VALUES ('{$gateway}', '{$transaction_date}', '{$account_number}', '{$sub_account}', '{$amount_in}', '{$amount_out}', '{$accumulated}', '{$code}', '{$transaction_content}', '{$reference_number}', '{$body}')";
 
-// Biểu thức regex để khớp với mã đơn hàng
+// Thực hiện lưu giao dịch
+if ($conn->query($sql) !== TRUE) {
+    echo json_encode(['success' => false, 'message' => 'Cannot insert record to MySQL: ' . $conn->error]);
+    die();
+}
+
+// Biểu thức regex để khớp với mã đơn hàng (ví dụ: DH123456)
 $regex = '/DH(\d+)/';
 
-// Sử dụng preg_match để khớp regex với chuỗi nội dung chuyển tiền
-preg_match($regex, $transaction_content, $matches);
+// Tìm mã đơn hàng trong nội dung chuyển tiền
+if (preg_match($regex, $transaction_content, $matches)) {
+    $pay_order_id = $matches[1];
 
-// Lấy mã đơn hàng từ kết quả khớp
-$pay_order_id = $matches[1];
+    // Kiểm tra mã đơn hàng có phải số không
+    if (!is_numeric($pay_order_id)) {
+        echo json_encode(['success' => false, 'message' => 'Invalid order ID format']);
+        die();
+    }
 
-// Nếu không tìm thấy mã đơn hàng từ nội dung thanh toán thì trả về kết quả lỗi
-if(!is_numeric($pay_order_id)) {
-    echo json_encode(['success' => false, 'message' => 'Order not found. Order_id ' . $pay_order_id]);
-    die();
-}
+    // Tìm đơn hàng theo ID, số tiền và trạng thái chưa thanh toán
+    $result = $conn->query("SELECT * FROM tb_orders WHERE id={$pay_order_id} AND total={$amount_in} AND payment_status='Unpaid'");
 
-// Tìm đơn hàng với mã đơn hàng và số tiền tương ứng với giao dịch thanh toán trên. Điều kiện là id đơn hàng, số tiền, trạng thái đơn hàng phải là 'Unpaid'
-$result = $conn->query("SELECT * FROM tb_orders where id={$pay_order_id} AND total={$amount_in} AND payment_status='Unpaid'");
+    if ($result && $result->num_rows > 0) {
+        // Cập nhật trạng thái đơn hàng thành đã thanh toán
+        $update = $conn->query("UPDATE tb_orders SET payment_status='Paid' WHERE id={$pay_order_id}");
 
-// Nếu không tìm thấy đơn hàng
-if(!$result) {
-    echo json_encode(['success' => false, 'message' => 'Order not found. Order_id ' . $pay_order_id]);
-    die();
+        if ($update) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to update order status']);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Order not found or already paid']);
+    }
 } else {
-    // Tìm thấy đơn hàng, update trạng thái 
-    $conn->query("UPDATE tb_orders SET payment_status='Paid' WHERE id='{$pay_order_id}'");
-    echo json_encode(['success'=>TRUE]);
-
+    // Không tìm thấy mã đơn hàng trong nội dung giao dịch
+    echo json_encode(['success' => false, 'message' => 'Order ID not found in transaction content']);
 }
- 
-?>
+
+die();
