@@ -47,7 +47,7 @@ require_once("config.php");
 
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <style>
+    <style>
         body {
             background: white;
         }
@@ -69,7 +69,7 @@ require_once("config.php");
                 if (isset($code) == 1) {
                 ?>
                     <ul class="header-links pull-right">
-                        <li><a href="blank.php"><i class="fa fa-dollar"></i> USD</a></li>
+                        <li><a href="blank.php"><i class=""></i> Lịch sử mua hàng</a></li>
                         <li><a href="logout.php"><i class="fa fa-user-o"></i>Đăng xuất</a></li>
                     </ul>
                 <?php
@@ -97,7 +97,7 @@ require_once("config.php");
                     <div class="col-md-3">
                         <div class="header-logo">
                             <a href="#" class="logo">
-                                <img src="./img/logo.png" alt="">
+                                <img src="" alt="">
                             </a>
                         </div>
                     </div>
@@ -130,7 +130,7 @@ require_once("config.php");
                     <div class="col-md-3 clearfix">
                         <div class="header-ctn">
                             <!-- Wishlist -->
-                           
+
                             <!-- Cart -->
 
 
@@ -139,19 +139,18 @@ require_once("config.php");
                                     <i class="fa fa-shopping-cart"></i>
                                     <span>Your Cart</span>
                                     <?php
-                                    $id = isset($_SESSION['id'])?$_SESSION['id']:null;
-                                
-                                        $query = mysqli_query($conn, "SELECT * from `cart` where `UserID`='$id'");
+                                    $id = isset($_SESSION['User']['id']) ? $_SESSION['User']['id'] : null;
 
-                                        $num = mysqli_num_rows($query);
-                                        if ($num > 0) {
-                                            $nums = $num;
-                                            echo '<div class="qty">' . $nums . '</div>';
-                                        } else {
-                                            echo '<div class="qty">0</div>';
-                                        }
-                           
+                                    if ($id) {
+                                        $query = mysqli_query($conn, "SELECT SUM(Quantity) as total FROM `cart` WHERE `UserID` = '$id'");
+                                        $row = mysqli_fetch_assoc($query);
+                                        $count = $row['total'] ?? 0;       
+                                        echo '<div class="qty">' . $count . '</div>';
+                                    } else {
+                                        echo '<div class="qty">0</div>';
+                                    }
                                     ?>
+
                                 </a>
                                 <div id="cart-dropdown" class="cart-dropdown">
                                     <!-- Nội dung giỏ hàng -->

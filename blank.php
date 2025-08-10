@@ -1,6 +1,6 @@
 <?php
 require_once('./sytem/header.php');
-$user = $_SESSION['User'];
+$user = $_SESSION['User']["username"];
 
 if (!isset($_SESSION['User'])) {
 	header('location: /login.php');
@@ -38,7 +38,31 @@ while ($rowOrder = mysqli_fetch_assoc($queryOrder)) {
 			<?= $ok; ?>
 		</div>
 	</div>
-
+  <div class="card mb-4 order-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5>Đơn hàng #</h5>
+                        <p class="mb-1 text-muted">Ngày đặt: ''</p>
+                        <p class="mb-1 text-muted">Trạng thái: <strong></strong></p>
+                    </div>
+                    <div class="text-end">
+                        <p class="mb-1"><strong>Tổng tiền:</strong></p>
+                        <h5 class="text-primary"> đ</h5>
+                    </div>
+                </div>
+                <hr>
+                <h6>Chi tiết sản phẩm:</h6>
+                <ul class="list-group list-group-flush">
+                   
+                </ul>
+                <div class="mt-3 text-end">
+                    <a href="order_detail.php?id=" class="btn btn-outline-primary btn-sm">
+                        Xem chi tiết
+                    </a>
+                </div>
+            </div>
+        </div>
 <?php
 }
 require_once('./sytem/end.php');

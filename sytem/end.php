@@ -199,70 +199,182 @@
             $('#cart-dropdown-toggle').on('click', function() {
                 $.ajax({
                     url: '/api/user.php?action=GetCart',
-                    type: 'get',
+                    type: 'GET',
                     dataType: 'json',
                     success: function(result) {
-                        if (result.status === '200') {
+                        console.log(result);
+                        if (result.status === 200) {
                             displayCartItems(result.msg);
-
-                            $('.delete').on('click', function() {
-                                var id = $(this).data('id');
-                                console.log('check id', id)
-                                $.ajax({
-                                    url: '/api/user.php?action=DeleteCart',
-                                    type: 'POST',
-                                    dataType: 'json',
-                                    data: {
-                                        id: id
-                                    },
-                                    success: function(data) {
-                                        if (data.status == 200) {
-                                            location.reload();
-                                        } else {
-                                            location.reload();
-                                        }
-                                    },
-                                    error: function(xhr, status, error) {
-                                        console.error('Error:', error);
-                                    }
-                                })
-
-
-                            });
-
                         } else {
-                            alert(data.msg);
+                            alert(result.msg);
+                            window.location.href = "./login.php";
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.error('Error:', error);
+                        console.error('AJAX error:', error);
                     }
                 });
             });
-
-
         });
 
         function displayCartItems(cartItems) {
             var cartDropdown = $('#cart-dropdown');
             cartDropdown.empty();
+
+            if (!cartItems || cartItems.length === 0) {
+                cartDropdown.append('<p>Giỏ hàng trống</p>');
+                return;
+            }
+
             cartItems.forEach(function(item) {
-                var productWidget = $('<div>').addClass('product-widget');
-                var productImg = $('<div>').addClass('product-img').append($('<img>').attr('src', item.img)
-                    .attr('alt', item.ProductName));
-                var productBody = $('<div>').addClass('product-body').append(
-                    $('<h3>').addClass('product-name').append($('<a>').attr('href', 'product.php?id=' + item.id).text(item
-                        .ProductName)),
-                    $('<h4>').addClass('product-price').append($('<span>').addClass('qty').text('1x'),
-                        '$' + item.Price)
+                const productWidget = $('<div>').addClass('product-widget');
+
+                const productImg = $('<div>').addClass('product-img').append(
+                    $('<img>').attr('src', item.img).attr('alt', item.ProductName)
                 );
-                var deleteBtn = $('<button>').addClass('delete').append($('<i>').addClass('fa fa-close'))
-                    .attr('data-id', item.id);
+
+                const productBody = $('<div>').addClass('product-body').append(
+                    $('<h3>').addClass('product-name').append(
+                        $('<a>').attr('href', 'product.php?id=' + item.id).text(item.ProductName)
+                    ),
+                    $('<h4>').addClass('product-price').append(
+                        $('<span>').addClass('qty').text(item.Quantity + 'x '),
+                        '$' + formatPrice(item.Price)
+                    )
+                );
+
+                const deleteBtn = $('<button>')
+                    .addClass('delete')
+                    .attr('data-id', item.CartID)
+                    .append($('<i>').addClass('fa fa-close'));
+
+
 
                 productWidget.append(productImg, productBody, deleteBtn);
                 cartDropdown.append(productWidget);
             });
+            // Gắn lại sự kiện xoá
+            $('.delete').on('click', function() {
+                const id = $(this).data('id');
+                $.ajax({
+                    url: '/api/user.php?action=DeleteCart',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        id
+                    },
+                    success: function(data) {
+                        if (data.status == 200) {
+                            alert(data.msg);
+                            location.reload();
+                        } else {
+                            alert(data.msg);
+                            location.reload();
+                        }
+                    }
+                });
+            });
+            const cartBtns = $(`
+    <div class="cart-btns">
+        <a href="/cart.php">View Cart</a>
+        <a href="/checkout.php">Checkout <i class="fa fa-arrow-circle-right"></i></a>
+    </div>
+`);
+
+            cartDropdown.append(cartBtns);
+
+
+            ;
         }
+
+        function formatPrice(price) {
+            return parseFloat(price).toLocaleString('vi-VN') + ' VND';
+        }
+    </script>
+    <script>
+    $(document).ready(function() {
+    $(document).on('click', '.add-to-cart-btn1', function(event) {
+        event.preventDefault(); // vẫn nên giữ để an toàn
+
+        const id = $(this).data("id");
+        if (!id) {
+            alert("Không tìm thấy ID sản phẩm!");
+            return;
+        }
+
+        const quantity = parseInt($("#my-input").val()) || 1;
+
+        $.ajax({
+            type: 'POST',
+            url: "/api/user.php?action=addCart",
+            data: {
+                id: id,
+                quantity: quantity
+            },
+            dataType: "json",
+            success: function(result) {
+                if (result.status === 200) {
+                    alert(result.msg);
+                    setTimeout(() => {
+                        window.location.href = "cart.php?selected=" + id;
+                    }, 100);
+                } else if (result.status == 500) {
+                    alert(result.msg);
+                    window.location.href = "login.php";
+                } else if (result.status == 404) {
+                    alert(result.msg);
+                } else {
+                    alert("Vui lòng đăng nhập");
+                    window.location.href = "/login.php";
+                }
+            },
+            error: function(xhr, status, error) {
+                alert("Đã xảy ra lỗi khi thêm giỏ hàng.");
+                console.log(error);
+            }
+        });
+    });
+});
+
+        $(document).ready(function() {
+            $(".add-to-cart-btn").click(function(event) {
+                event.preventDefault();
+
+                var id = $(this).data("id"); // ✅ lấy đúng data-product-id
+                console.log("ID sản phẩm:", id); // ✅ Kiểm tra ID sản phẩm
+                if (!id) {
+                    alert("Không tìm thấy ID sản phẩm!");
+                    return;
+                }
+
+                // Nếu bạn có input my-input, thì mở dòng dưới
+                var quantity = parseInt($("#my-input").val()) || 1;
+
+                $.ajax({
+                    type: 'POST',
+                    url: "/api/user.php?action=addCart",
+                    data: {
+                        id: id,
+                        quantity: quantity
+                    },
+                    dataType: "json",
+                    success: function(result) {
+                        if (result.status === 200) {
+                            alert(result.msg);
+                            location.reload(); // 
+                        } else if (result.status == 500) {
+                            alert(result.msg);
+                            window.location.href = "login.php";
+                        } else if (result.status == 404) {
+                            alert(result.msg);
+                        } else {
+                            alert("Vui lòng đăng nhập");
+                            window.location.href = "/login.php";
+                        }
+                    }
+                });
+            });
+        });
     </script>
     </body>
 

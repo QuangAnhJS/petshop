@@ -37,7 +37,7 @@ require_once("./sytem/config.php");
                                 <div class="products-slick" data-nav="#slick-nav-1">
                                     <!-- product -->
                                     <?php
-                                    $query = mysqli_query($conn, "SELECT * from `product` where `type`=1");
+                                   $query = mysqli_query($conn, "SELECT * FROM `product` WHERE `type` = 1 AND `StockQuantity` IS NOT NULL AND `StockQuantity` > 0");
                                     while ($row = mysqli_fetch_assoc($query)) {
 
                                     ?>
@@ -167,8 +167,10 @@ require_once("./sytem/config.php");
                                                 </div>
                                             </div>
                                             <div class="add-to-cart">
-                                                <button class="add-to-cart-btn" data-id="<?= $row['id']; ?>"><i class="fa fa-shopping-cart"></i> add to
-                                                    cart</button>
+                                                <button type="button" class="add-to-cart-btn fa-dedent" data-id="<?= $row['id']; ?>">
+                                                    <i class="fa fa-shopping-cart"></i> Add to cart
+                                                </button>
+
                                             </div>
                                         </div>
                                     <?php
@@ -207,22 +209,24 @@ require_once("./sytem/config.php");
     <!-- /SECTION -->
 
     <!-- NEWSLETTER -->
- 
+
 </div>
-<script>
+<!-- <script>
     $(document).ready(function() {
         $(".add-to-cart-btn").click(function(event) {
             event.preventDefault();
             var id = $(this).data("id");
+            var quanlity = $this.data("data-product-id");
             $.ajax({
                 type: 'POST',
                 url: "/api/user.php?action=addCart",
                 data: {
-                    id: id
+                    id: id,
+                    quanlity: quanlity
                 },
                 dataType: "json",
                 success: function(result) {
-                    if (result.status == 200) {
+                    if (result.status === 200) {
                         alert(result.msg);
                         location.reload();
                     } else if (result.status == 500) {
@@ -230,13 +234,16 @@ require_once("./sytem/config.php");
                         window.location.href = "login.php";
                     } else if (result.status == 404) {
                         alert(result.msg);
+                    } else {
+                        alert("vui lòng dang nhập");
+                        window.location.href = "/login.php";
                     }
                 }
             });
 
         });
     })
-</script>
+</script> -->
 
 <!-- /NEWSLETTER -->
 <?php
